@@ -36,11 +36,20 @@ fn parse_config(file: PathBuf) -> io::Result<ConfigVars> {
             continue;
         }
         // icons
-        if lines.trim().starts_with("ico_entry") {
-            conf.ico_entry = get_value(lines);
+        if lines.trim().starts_with("ico_entry_success") {
+            conf.ico_entry_success = get_value(lines);
+        }
+        if lines.trim().starts_with("ico_entry_failed") {
+            conf.ico_entry_failed = get_value(lines);
         }
 
         // colors
+        if lines.trim().starts_with("col_entry_success") {
+            conf.col_entry_success = get_value(lines);
+        }
+        if lines.trim().starts_with("col_entry_failed") {
+            conf.col_entry_failed = get_value(lines);
+        }
         if lines.trim().starts_with("col_main") {
             conf.col_main = get_value(lines);
         }
@@ -82,19 +91,25 @@ fn get_value(l: &str) -> String {
 
 // *brakoll - d: collect variables in struct, p: 50, t: refactor, s: closed
 pub struct ConfigVars {
+    pub ico_entry_success: String,
+    pub ico_entry_failed: String,
+    pub col_entry_success: String,
+    pub col_entry_failed: String,
     pub col_main: String,
     pub col_git_paren: String,
     pub col_git_branch: String,
     pub set_space: bool,
     pub set_prompt_newline: bool,
-    pub ico_entry: String,
 }
 
 impl ConfigVars {
     /// set defaults
     fn new() -> Self {
         Self {
-            ico_entry: "".to_string(),
+            ico_entry_success: "".to_string(),
+            ico_entry_failed: "󰯈".to_string(),
+            col_entry_success: "#9ec1a3".to_string(),
+            col_entry_failed: "#aa4465".to_string(),
             col_main: "#aab3c0".to_string(),
             col_git_paren: "#aab3c0".to_string(),
             col_git_branch: "#9ec1a3".to_string(),
@@ -104,7 +119,8 @@ impl ConfigVars {
     }
     #[allow(dead_code)]
     pub fn debug_print(&mut self) {
-        println!("icon entry: {}", self.ico_entry);
+        println!("icon entry: {}", self.ico_entry_success);
+        println!("icon entry: {}", self.ico_entry_failed);
         println!("color main: {}", self.col_main);
         println!("col git branch: {}", self.col_git_branch);
         println!("col git paren: {}", self.col_git_paren);
@@ -112,3 +128,4 @@ impl ConfigVars {
         println!("set prompt nl: {}", self.set_prompt_newline);
     }
 }
+

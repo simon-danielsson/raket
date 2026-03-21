@@ -58,9 +58,13 @@ Launch Raket for the first time to generate a default config file:
 ``` conf
 # === icons ===
 
-ico_entry = 
+ico_entry_success = 
+ico_entry_failed = 󰯈
 
 # === colors ===
+
+col_entry_success = #9ec1a3
+col_entry_failed = #aa4465
 
 col_main = #aab4c0
 col_git_branch = #9ec1a3

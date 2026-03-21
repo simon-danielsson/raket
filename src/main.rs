@@ -13,17 +13,21 @@ mod config;
 
 // *brakoll - d: add extra git details, p: 20, t: feature, s: open
 // *brakoll - d: add cargo env status, p: 10, t: feature, s: open
-// *brakoll - d: add variable/logic for failed return code icon, p: 30, t: feature, s: prog
+// *brakoll - d: add variable/logic for failed return code icon, p: 30, t: feature, s: closed
 
 // *brakoll - d: capture return code, p: 30, t: feature, s: closed
-fn status_code() -> u32 {
+/// returns true if the last program exited successfully
+fn status_code() -> bool {
     let args: Vec<String> = env::args().collect();
 
     if let Some(status_arg) = args.iter().find(|a| a.starts_with("--status=")) {
         let status = &status_arg["--status=".len()..];
-        return status.parse().unwrap();
+        match status.parse().unwrap() {
+            0 => return true,
+            _ => return false,
+        }
     } else {
-        return 0;
+        return true;
     }
 }
 
@@ -33,17 +37,18 @@ fn main() -> io::Result<()> {
 
     // vars.debug_print();
 
-    // return code of last run program
-    let status = status_code();
-    println!("last status: {status}");
-
     // init
     let mut r: Raket = Raket::new();
 
     // derive components
     r.get_cwd(&vars.col_main);
     r.get_git_branch(&vars.col_git_branch);
-    r.get_entry_sym(&vars.col_main, &vars.ico_entry);
+    r.get_entry_sym(
+        &vars.col_entry_success,
+        &vars.ico_entry_success,
+        &vars.col_entry_failed,
+        &vars.ico_entry_failed,
+    );
 
     // build
     let prompt = r.build(&vars.col_git_paren, vars.set_prompt_newline);
@@ -131,11 +136,24 @@ impl Raket {
         prompt
     }
 
-    fn get_entry_sym(&mut self, color: &str, icon: &str) {
+    fn get_entry_sym(
+        &mut self,
+        color_success: &str,
+        icon_success: &str,
+        color_failed: &str,
+        icon_failed: &str,
+    ) {
+        let status = status_code();
+        // println!("last status: {status}");
+        let (entry_icon, entry_col) = match status {
+            true => (icon_success, color_success),
+            false => (icon_failed, color_failed),
+        };
+
         self.components.push(PromptComponent {
             ctype: ComponentType::Entry,
-            fg_col_hex: color.to_string(),
-            content: String::from(icon),
+            fg_col_hex: entry_col.to_string(),
+            content: entry_icon.to_string(),
         });
     }
 
