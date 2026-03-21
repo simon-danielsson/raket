@@ -29,58 +29,65 @@ fn parse_config(file: PathBuf) -> io::Result<ConfigVars> {
 
     let iter = contents.lines().into_iter();
     for lines in iter {
-        if lines.trim().starts_with("#") {
-            continue;
-        }
-        if lines.trim().is_empty() {
-            continue;
-        }
-        // icons
-        if lines.trim().starts_with("ico_entry_success") {
-            conf.ico_entry_success = get_value(lines);
-        }
-        if lines.trim().starts_with("ico_entry_failed") {
-            conf.ico_entry_failed = get_value(lines);
-        }
+        let l = lines.trim();
 
-        // colors
-        if lines.trim().starts_with("col_entry_success") {
-            conf.col_entry_success = get_value(lines);
-        }
-        if lines.trim().starts_with("col_entry_failed") {
-            conf.col_entry_failed = get_value(lines);
-        }
-        if lines.trim().starts_with("col_main") {
-            conf.col_main = get_value(lines);
-        }
-        if lines.trim().contains("col_git_branch") {
-            conf.col_git_branch = get_value(lines);
-        }
-        if lines.trim().starts_with("col_git_paren") {
-            conf.col_git_paren = get_value(lines);
-        }
+        match l {
+            // skip comments and empty lines
+            l if l.starts_with("#") => {
+                continue;
+            }
+            l if l.is_empty() => {
+                continue;
+            }
 
-        // settings
-        if lines.trim().starts_with("set_space") {
-            let v = get_value(lines);
-            if v.to_lowercase().contains("tr") {
-                conf.set_space = true;
-            } else {
-                conf.set_space = false;
+            // icons
+            l if l.starts_with("ico_entry_success") => {
+                conf.ico_entry_success = get_value(lines);
             }
-        }
-        if lines.trim().starts_with("set_prompt_newline") {
-            let v = get_value(lines);
-            if v.to_lowercase().contains("tr") {
-                conf.set_prompt_newline = true;
-            } else {
-                conf.set_prompt_newline = false;
+            l if l.starts_with("ico_entry_failed") => {
+                conf.ico_entry_failed = get_value(lines);
             }
+
+            // colors
+            l if l.starts_with("col_entry_success") => {
+                conf.col_entry_success = get_value(lines);
+            }
+            l if l.starts_with("col_entry_failed") => {
+                conf.col_entry_failed = get_value(lines);
+            }
+            l if l.starts_with("col_main") => {
+                conf.col_main = get_value(lines);
+            }
+            l if l.contains("col_git_branch") => {
+                conf.col_git_branch = get_value(lines);
+            }
+            l if l.starts_with("col_git_status") => {
+                conf.col_git_status = get_value(lines);
+            }
+
+            // settings
+            l if l.starts_with("set_space") => {
+                conf.set_space = parse_bool(&get_value(l));
+            }
+            l if l.starts_with("set_prompt_newline") => {
+                conf.set_prompt_newline = parse_bool(&get_value(l));
+            }
+            l if l.starts_with("set_show_git_branch") => {
+                conf.set_show_git_branch = parse_bool(&get_value(l));
+            }
+            l if l.starts_with("set_show_git_status") => {
+                conf.set_show_git_status = parse_bool(&get_value(l));
+            }
+            _ => {}
         }
     }
 
     // placeholder
     Ok(conf)
+}
+
+fn parse_bool(s: &str) -> bool {
+    s.to_ascii_lowercase().starts_with("tr")
 }
 
 fn get_value(l: &str) -> String {
@@ -96,10 +103,12 @@ pub struct ConfigVars {
     pub col_entry_success: String,
     pub col_entry_failed: String,
     pub col_main: String,
-    pub col_git_paren: String,
+    pub col_git_status: String,
     pub col_git_branch: String,
     pub set_space: bool,
     pub set_prompt_newline: bool,
+    pub set_show_git_branch: bool,
+    pub set_show_git_status: bool,
 }
 
 impl ConfigVars {
@@ -111,10 +120,12 @@ impl ConfigVars {
             col_entry_success: "#9ec1a3".to_string(),
             col_entry_failed: "#aa4465".to_string(),
             col_main: "#aab3c0".to_string(),
-            col_git_paren: "#aab3c0".to_string(),
+            col_git_status: "#aab3c0".to_string(),
             col_git_branch: "#9ec1a3".to_string(),
             set_space: true,
             set_prompt_newline: true,
+            set_show_git_branch: true,
+            set_show_git_status: true,
         }
     }
     #[allow(dead_code)]
@@ -123,9 +134,8 @@ impl ConfigVars {
         println!("icon entry: {}", self.ico_entry_failed);
         println!("color main: {}", self.col_main);
         println!("col git branch: {}", self.col_git_branch);
-        println!("col git paren: {}", self.col_git_paren);
+        println!("col git paren: {}", self.col_git_status);
         println!("set space: {}", self.set_space);
         println!("set prompt nl: {}", self.set_prompt_newline);
     }
 }
-

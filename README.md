@@ -72,7 +72,7 @@ col_entry_failed = #aa4465
 
 col_main = #aab4c0
 col_git_branch = #9ec1a3
-col_git_paren = #aab3c0
+col_git_status = #aa4465
 
 # === settings ===
 
@@ -81,6 +81,9 @@ set_space = true
 
 # if true, the prompt input will be below. if false, on the same line
 set_prompt_newline = true
+
+set_show_git_branch = true
+set_show_git_status = true
 ```
   
 ---

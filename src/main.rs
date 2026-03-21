@@ -11,7 +11,7 @@ use crate::config::ConfigVars;
 mod ansi;
 mod config;
 
-// *brakoll - d: add extra git details, p: 20, t: feature, s: open
+// *brakoll - d: add extra git details, p: 20, t: feature, s: closed
 // *brakoll - d: add cargo env status, p: 10, t: feature, s: open
 // *brakoll - d: add variable/logic for failed return code icon, p: 30, t: feature, s: closed
 
@@ -40,9 +40,15 @@ fn main() -> io::Result<()> {
     // init
     let mut r: Raket = Raket::new();
 
-    // derive components
     r.get_cwd(&vars.col_main);
-    r.get_git_branch(&vars.col_git_branch);
+
+    if vars.set_show_git_branch {
+        r.get_git_branch(&vars.col_git_branch);
+    }
+    if vars.set_show_git_status {
+        r.get_git_status(&vars.col_git_status);
+    }
+
     r.get_entry_sym(
         &vars.col_entry_success,
         &vars.ico_entry_success,
@@ -51,7 +57,7 @@ fn main() -> io::Result<()> {
     );
 
     // build
-    let prompt = r.build(&vars.col_git_paren, vars.set_prompt_newline);
+    let prompt = r.build(vars.set_prompt_newline);
 
     // print
     let mut newline = "\n";
@@ -65,6 +71,7 @@ fn main() -> io::Result<()> {
 
 #[derive(Clone, PartialEq)]
 enum ComponentType {
+    GitStatus,
     GitBranch,
     Entry,
     CWD,
@@ -101,29 +108,12 @@ impl Raket {
     }
 
     // *brakoll - d: args for placing entry on new line and adding set_space between each command, p: 60, t: feature, s: closed
-    fn build(&mut self, col_git_branch_paren: &str, set_prompt_newline: bool) -> String {
+    fn build(&mut self, set_prompt_newline: bool) -> String {
         let mut prompt = String::new();
         // add components
         for c in self.components.clone() {
             // git branch
-            if c.ctype == ComponentType::GitBranch && c.content != "" {
-                let l_par = ansi::apply_color(
-                    col_git_branch_paren.to_string(),
-                    "(".to_string(),
-                );
-                let r_par = ansi::apply_color(
-                    col_git_branch_paren.to_string(),
-                    ")".to_string(),
-                );
-                prompt = format!(
-                    "{pr} {lp}{br}{rp}",
-                    pr = prompt,
-                    lp = l_par,
-                    br = c,
-                    rp = r_par
-                )
-                // prompt entry
-            } else if c.ctype == ComponentType::Entry {
+            if c.ctype == ComponentType::Entry {
                 if set_prompt_newline {
                     prompt = format!("{}\n{} ", prompt, c)
                 } else {
@@ -177,6 +167,32 @@ impl Raket {
         });
     }
 
+    fn get_git_status(&mut self, color: &str) {
+        let output = Command::new("git")
+            .args(["status", "--porcelain"])
+            .output()
+            .ok()
+            .unwrap();
+        let output = String::from_utf8_lossy(&output.stdout).trim().to_string();
+
+        let statuses = [("M ", ""), ("D ", ""), ("??", "")];
+
+        let content = statuses
+            .iter()
+            .filter_map(|(pattern, icon)| {
+                let count = output.matches(pattern).count();
+                (count > 0).then(|| format!(" {icon} {count}"))
+            })
+            .collect::<Vec<_>>()
+            .join("");
+
+        self.components.push(PromptComponent {
+            ctype: ComponentType::GitStatus,
+            fg_col_hex: color.to_string(),
+            content,
+        });
+    }
+
     fn get_git_branch(&mut self, color: &str) {
         let output = Command::new("git")
             .args(["rev-parse", "--abbrev-ref", "HEAD"])
@@ -198,7 +214,7 @@ impl Raket {
         self.components.push(PromptComponent {
             ctype: ComponentType::GitBranch,
             fg_col_hex: color.to_string(),
-            content: format!("{}", branch).to_string(),
+            content: format!("  {}", branch).to_string(),
         });
     }
 }
