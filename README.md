@@ -41,10 +41,14 @@ Install binary using cargo:
 cargo install raket
 ```
   
-Add the following line to your .bashrc:
+Add the following lines to your .bashrc:
   
 ``` bash
-PROMPT_COMMAND='PS1="$(raket)"'
+_raket() {
+    local last_status=$?
+    PS1="$(raket --status="$last_status")"
+}
+PROMPT_COMMAND=_raket
 ```
   
 ---
