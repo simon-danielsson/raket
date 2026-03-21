@@ -7,19 +7,32 @@ use std::{env, fmt};
 mod ansi;
 
 fn main() {
-    let mut r: Raket = Raket::new();
-
+    // args
     let col_main = "#aab3c0";
     let col_git_br = "#9ec1a3";
     let git_paren = col_main;
 
+    let add_newline = true;
+    let entry_on_new_line = true;
+
+    // init
+    let mut r: Raket = Raket::new();
+
+    // derive components
     r.get_cwd(col_main);
     r.get_git_branch(col_git_br);
     r.get_entry_sym(col_main);
 
-    let prompt = r.build(git_paren);
+    // build
+    let prompt = r.build(git_paren, entry_on_new_line);
 
-    print!("{}", prompt);
+    // print
+    let mut newline = "\n";
+    if !add_newline {
+        newline = "";
+    }
+
+    print!("{newline}{prompt}");
 }
 
 #[derive(Clone, PartialEq)]
@@ -59,10 +72,12 @@ impl Raket {
         }
     }
 
-    fn build(&mut self, col_git_branch_paren: &str) -> String {
+    // *brakoll - d: args for placing entry on new line and adding space between each command, p: 60, t: feature, s: closed
+    fn build(&mut self, col_git_branch_paren: &str, entry_on_new_line: bool) -> String {
         let mut prompt = String::new();
         // add components
         for c in self.components.clone() {
+            // handle git branch
             if c.ctype == ComponentType::GitBranch && c.content != "" {
                 let l_par = ansi::apply_color(
                     col_git_branch_paren.to_string(),
@@ -79,6 +94,12 @@ impl Raket {
                     br = c,
                     rp = r_par
                 )
+            } else if c.ctype == ComponentType::Entry {
+                if entry_on_new_line {
+                    prompt = format!("{}\n{}", prompt, c)
+                } else {
+                    prompt = format!("{} {}", prompt, c)
+                }
             } else {
                 prompt = format!("{}{}", prompt, c)
             }
@@ -90,7 +111,7 @@ impl Raket {
         self.components.push(PromptComponent {
             ctype: ComponentType::Entry,
             fg_col_hex: color.to_string(),
-            content: String::from("\n "),
+            content: String::from(" "),
         });
     }
 

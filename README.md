@@ -33,8 +33,16 @@
 
 ## Install
   
+Install binary using cargo:
+  
 ``` bash
 cargo install raket
+```
+  
+Add the following line to your .bashrc:
+  
+``` bash
+PROMPT_COMMAND='PS1="$(raket)"'
 ```
   
 ---
