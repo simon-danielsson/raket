@@ -42,6 +42,7 @@ fn main() -> io::Result<()> {
 
     r.get_cwd(&vars.col_main);
 
+    // *brakoll - d: parents in git branch still there if no git repo, p: 100, t: fix, s: closed
     if vars.set_show_git_branch {
         r.get_git_branch(&vars.col_git_branch);
     }
@@ -114,7 +115,11 @@ impl Raket {
         for c in self.components.clone() {
             // git branch
             if c.ctype == ComponentType::GitBranch {
-                prompt = format!("{} ({})", prompt, c)
+                if c.content.is_empty() {
+                    {}
+                } else {
+                    prompt = format!("{} ({})", prompt, c)
+                }
             } else if c.ctype == ComponentType::Entry {
                 if set_prompt_newline {
                     prompt = format!("{}\n{} ", prompt, c)
