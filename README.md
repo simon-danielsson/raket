@@ -63,7 +63,7 @@ Launch Raket for the first time to generate a default config file:
 # === icons ===
 
 ico_entry_success = 
-ico_entry_failed = 󰯈
+ico_entry_failed = 
 
 # === colors ===
 
