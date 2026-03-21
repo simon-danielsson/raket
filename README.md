@@ -15,7 +15,7 @@
 <p align="center">
   <a href="#feat">Features</a> •
   <a href="#install">Install</a> •
-  <a href="#usage">Usage</a> •
+  <a href="#config">Config</a> •
   <a href="#deps">Dependencies</a> •
   <a href="#license">License</a>
 </p>  
@@ -46,91 +46,30 @@ PROMPT_COMMAND='PS1="$(raket)"'
 ```
   
 ---
-<div id="usage"></div>
+<div id="config"></div>
 
-## Usage
+## Config
   
-### CLI
-  
-Generate initialized raket template file (without target dir, current directory is assumed):  
-  
-``` terminal
-raket init <target dir>
-```
-  
-Generate folder structure from template file (without target dir, current directory is assumed):  
-  
-``` terminal
-raket -f <raket template file> <target dir>
-```
-  
-In your raket template file you can set variables,
-and they can all be overridden through the CLI at your leisure. Just make sure that the variable you're overriding exists in you raket file and that you're supplying the right kind of value! (e.g a folder variable override would need a filepath, a string variable would need a string and so on)
-  
-``` terminal
-$ raket ... -var variable="value"
-$ raket ... -v variable="value"
-$ raket ... --var variable="value"
-
-Example:
-$ raket -f template.raket --var stems="/Users/usr/Downloads/stems/" --var client="New Client" --var rpp="/Users/usr/music/templates/mix.rpp"
-```
-  
-Display help and version information:  
-  
-``` terminal
-raket help
-```
-  
-### Template file (.raket)
-  
-The core workflow of Raket consists of feeding the CLI with raket template files. A raket file (file with the .raket extension) is divided up into three sections: variables, settings and hierarchy. This format accepts comments (prefixed with '#'), but comment lines should be separate from the parameter lines since doing otherwise could lead to undefined behaviour. For more details, read the comments in the example below!
-  
-#### Full example
+Launch Raket for the first time to generate a default config file:  
+`~/.config/raket/config`  
   
 ``` conf
-# there are only three different datatypes to keep track of:
+icons [
+    prompt = ""
+]
 
-# 1: <string> - used for name variables
-
-# 2: <file> - an empty generic file, where the extension in its name will specify the extension of the file once generated
-# variables with the datatype <file> will inherit the same extension logic as a generic file, only that the contents of the file variable path supplied will be the contents of the file generated
-
-# 3: <folder> - a generic folder
-# variables with the datatype <folder> will inherit the contents of the folder specified in the variables section
-
-variables [
-    # built-in: date
-    client: string = "client"
-    project: string = "project"
-    service: string = "mix"
-    rpp: file = "/Users/usr/music/templates/mix.RPP"
-    stems: folder = "/Users/usr/Downloads/stems_from_client/"
-    # you can create any variables you want
-    fruit: string = "banana"
+colors [
+    main = "#aab3c0"
+    git_branch = "#9ec1a3"
+    git_branch_paren = "#aab3c0"
 ]
 
 settings [
-    format_names: false
-    format_date: "%d-%m-%Y"
-]
+    # add space in between each command
+    space = true
 
-hierarchy [
-    folder "[$service] $client - $project, $date" {
-        folder "project" {
-            rpp "$project $date.RPP"
-            file "$fruit notes.md"
-        }
-
-        # it's legal to add extra files/folders to a folder variable
-        stems "stems" {
-            file "todo.md"
-        }
-
-        folder "export" {
-            folder "$fruit drafts" {}
-        }
-    }
+    # if true, the prompt input will be below. if false, on the same line
+    prompt_newline = true
 ]
 ```
   
@@ -139,7 +78,8 @@ hierarchy [
   
 ## Dependencies
   
-+ [chrono](https://github.com/chronotope/chrono)  
++ [raster](https://github.com/kosinix/raster)  
++ [regex](https://github.com/rust-lang/regex)  
   
 ---
 <div id="license"></div>
