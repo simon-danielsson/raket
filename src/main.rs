@@ -13,12 +13,29 @@ mod config;
 
 // *brakoll - d: add extra git details, p: 20, t: feature, s: open
 // *brakoll - d: add cargo env status, p: 10, t: feature, s: open
-// *brakoll - d: capture return codes and change entry icon/color accordingly, p: 30, t: feature, s: prog
+// *brakoll - d: add variable/logic for failed return code icon, p: 30, t: feature, s: prog
+
+// *brakoll - d: capture return code, p: 30, t: feature, s: closed
+fn status_code() -> u32 {
+    let args: Vec<String> = env::args().collect();
+
+    if let Some(status_arg) = args.iter().find(|a| a.starts_with("--status=")) {
+        let status = &status_arg["--status=".len()..];
+        return status.parse().unwrap();
+    } else {
+        return 0;
+    }
+}
 
 fn main() -> io::Result<()> {
+    // config variables
     let vars: ConfigVars = config::get()?;
 
     // vars.debug_print();
+
+    // return code of last run program
+    let status = status_code();
+    println!("last status: {status}");
 
     // init
     let mut r: Raket = Raket::new();
