@@ -11,5 +11,5 @@ homepage = "https://www.simondanielsson.se"
 rust-version = "1.94.0"
 
 [dependencies]
-chrono = "0.4.44"
-dirs = "6.0.0"
+raster = "0.2.0"
+regex = "1.12.3"

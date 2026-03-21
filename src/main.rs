@@ -1,45 +1,109 @@
 // *brakoll - d: init readme and license, p: 100, t: docs, s: closed
-// *brakoll - d: color enums to avoid hardcoding ansi color codes, p: 50, t: feature, s: open
+// *brakoll - d: color enums to avoid hardcoding ansi color codes, p: 50, t: feature, s: closed
 
-use std::env;
 use std::process::Command;
+use std::{env, fmt};
+
+mod ansi;
 
 fn main() {
-    let branch = get_git_branch();
-    let cwd = get_cwd();
+    let mut r: Raket = Raket::new();
 
-    let prompt = match branch {
-        Some(b) => format!("\x2b[32m{}\x1b[0m (\x1b[33m{}\x1b[0m) $ ", cwd, b),
-        None => format!("\x2b[32m{}\x1b[0m $ ", cwd),
-    };
+    let fg_main = "#aab3c0";
+
+    r.get_cwd(fg_main);
+    r.get_git_branch(fg_main);
+    r.get_entry_sym(fg_main);
+
+    let prompt = r.build();
 
     print!("{}", prompt);
 }
 
-// *brakoll - d: refactor cwd logic, p: 100, t: refactor, s: closed
-fn get_cwd() -> String {
-    let cd = env::current_dir()
-        .ok()
-        .map(|s| s.to_string_lossy().into_owned())
-        .unwrap_or("?".into());
-
-    let home = env::home_dir()
-        .map(|s| s.to_string_lossy().into_owned())
-        .unwrap_or("?".into());
-
-    cd.replace(&home, "~")
+struct Raket {
+    components: Vec<PromptComponent>,
+    home_sym: String,
 }
 
-fn get_git_branch() -> Option<String> {
-    let output = Command::new("git")
-        .args(["rev-parse", "--abbrev-ref", "HEAD"])
-        .output()
-        .ok()?;
+#[derive(Clone)]
+struct PromptComponent {
+    fg_col_hex: String,
+    content: String,
+}
 
-    if !output.status.success() {
-        return None;
+impl fmt::Display for PromptComponent {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            ansi::apply_color(self.fg_col_hex.clone(), self.content.clone())
+        )
+    }
+}
+
+impl Raket {
+    fn new() -> Self {
+        Self {
+            components: Vec::new(),
+            home_sym: String::from("~"),
+        }
     }
 
-    let branch = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    Some(branch)
+    fn build(&mut self) -> String {
+        let mut prompt = String::new();
+        // add components
+        for c in self.components.clone() {
+            prompt = format!("{}{}", prompt, c)
+        }
+        prompt
+    }
+
+    fn get_entry_sym(&mut self, color: &str) {
+        self.components.push(PromptComponent {
+            fg_col_hex: color.to_string(),
+            content: String::from("\n "),
+        });
+    }
+
+    // *brakoll - d: refactor cwd logic, p: 100, t: refactor, s: closed
+    fn get_cwd(&mut self, color: &str) {
+        let cd = env::current_dir()
+            .ok()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or("?".into());
+
+        let home = env::home_dir()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or("?".into());
+
+        let cwd_content = cd.replace(&home, &self.home_sym);
+
+        self.components.push(PromptComponent {
+            fg_col_hex: color.to_string(),
+            content: cwd_content,
+        });
+    }
+
+    fn get_git_branch(&mut self, color: &str) {
+        let output = Command::new("git")
+            .args(["rev-parse", "--abbrev-ref", "HEAD"])
+            .output()
+            .ok()
+            .unwrap();
+
+        if !output.status.success() {
+            self.components.push(PromptComponent {
+                fg_col_hex: color.to_string(),
+                content: String::new(),
+            });
+            return;
+        }
+
+        let branch = String::from_utf8_lossy(&output.stdout).trim().to_string();
+
+        self.components.push(PromptComponent {
+            fg_col_hex: color.to_string(),
+            content: format!("{}", branch).to_string(),
+        });
+    }
 }
