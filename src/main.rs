@@ -6,29 +6,39 @@ use std::{env, fmt};
 
 mod ansi;
 
-fn main() {
-    // args
-    let col_main = "#aab3c0";
-    let col_git_br = "#9ec1a3";
-    let git_paren = col_main;
+// *brakoll - d: collect variables in struct, p: 50, t: refactor, s: closed
+struct ConfigVars {
+    main_col: String,
+    git_paren_col: String,
+    git_branch_col: String,
+    add_newline: bool,
+    entry_on_new_line: bool,
+}
 
-    let add_newline = true;
-    let entry_on_new_line = true;
+fn main() {
+    // variables
+    let vars = ConfigVars {
+        main_col: "#aab3c0".to_string(),
+        git_paren_col: "#aab3c0".to_string(),
+        git_branch_col: "#9ec1a3".to_string(),
+        add_newline: true,
+        entry_on_new_line: true,
+    };
 
     // init
     let mut r: Raket = Raket::new();
 
     // derive components
-    r.get_cwd(col_main);
-    r.get_git_branch(col_git_br);
-    r.get_entry_sym(col_main);
+    r.get_cwd(&vars.main_col);
+    r.get_git_branch(&vars.git_branch_col);
+    r.get_entry_sym(&vars.main_col);
 
     // build
-    let prompt = r.build(git_paren, entry_on_new_line);
+    let prompt = r.build(&vars.git_paren_col, vars.entry_on_new_line);
 
     // print
     let mut newline = "\n";
-    if !add_newline {
+    if !vars.add_newline {
         newline = "";
     }
 
