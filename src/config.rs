@@ -1,3 +1,4 @@
+// *brakoll - d: better defaults, p: 20, t: fix, s: closed
 use std::{env, fs, io, path::PathBuf};
 
 const DEF_CONF: &str = include_str!("./default_config");

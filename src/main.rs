@@ -113,7 +113,9 @@ impl Raket {
         // add components
         for c in self.components.clone() {
             // git branch
-            if c.ctype == ComponentType::Entry {
+            if c.ctype == ComponentType::GitBranch {
+                prompt = format!("{} ({})", prompt, c)
+            } else if c.ctype == ComponentType::Entry {
                 if set_prompt_newline {
                     prompt = format!("{}\n{} ", prompt, c)
                 } else {
@@ -214,7 +216,7 @@ impl Raket {
         self.components.push(PromptComponent {
             ctype: ComponentType::GitBranch,
             fg_col_hex: color.to_string(),
-            content: format!("  {}", branch).to_string(),
+            content: format!("{}", branch).to_string(),
         });
     }
 }

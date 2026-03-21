@@ -5,12 +5,12 @@ ico_entry_failed = 
 
 # === colors ===
 
-col_entry_success = #9ec1a3
-col_entry_failed = #aa4465
+col_entry_success = #aab4c0
+col_entry_failed = #DF6C74
 
 col_main = #aab4c0
-col_git_branch = #9ec1a3
-col_git_status = #aa4465
+col_git_branch = #99C379
+col_git_status = #DF6C74
 
 # === settings ===
 
