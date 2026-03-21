@@ -25,8 +25,10 @@
 
 ## Features
   
-- For designing your folder structures Raket features its own scripting language with support for custom variables, striking a balance between flexibility and ease-of-use. [Neovim plugin for syntax highlighting and such is available here](https://github.com/simon-danielsson/raket.nvim).
-- Subcommands for normalizing, correcting and sorting raw audio stems in record-time (not implemented yet).
+- Configuration file that's easy to set up!
+  
+> [!IMPORTANT]  
+> Raket has currently only been tested on MacOS.
   
 ---
 <div id="install"></div>

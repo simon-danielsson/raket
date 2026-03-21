@@ -1,6 +1,7 @@
 // *brakoll - d: init readme and license, p: 100, t: docs, s: closed
 // *brakoll - d: new info, p: 100, t: docs, s: closed
 // *brakoll - d: color enums to avoid hardcoding ansi color codes, p: 50, t: feature, s: closed
+// *brakoll - d: update readme with new info, p: 60, t: docs, s: closed
 
 use std::process::Command;
 use std::{env, fmt, io};
@@ -10,8 +11,12 @@ use crate::config::ConfigVars;
 mod ansi;
 mod config;
 
+// *brakoll - d: add extra git details, p: 20, t: feature, s: open
+// *brakoll - d: add cargo env status, p: 10, t: feature, s: open
+// *brakoll - d: capture return codes and change entry icon/color accordingly, p: 30, t: feature, s: prog
+
 fn main() -> io::Result<()> {
-    let mut vars: ConfigVars = config::get()?;
+    let vars: ConfigVars = config::get()?;
 
     // vars.debug_print();
 
