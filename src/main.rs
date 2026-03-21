@@ -3,30 +3,17 @@
 // *brakoll - d: color enums to avoid hardcoding ansi color codes, p: 50, t: feature, s: closed
 
 use std::process::Command;
-use std::{env, fmt};
+use std::{env, fmt, io};
+
+use crate::config::ConfigVars;
 
 mod ansi;
+mod config;
 
-// *brakoll - d: collect variables in struct, p: 50, t: refactor, s: closed
-struct ConfigVars {
-    col_main: String,
-    col_git_paren: String,
-    col_git_branch: String,
-    set_space: bool,
-    set_prompt_newline: bool,
-    ico_prompt: String,
-}
+fn main() -> io::Result<()> {
+    let mut vars: ConfigVars = config::get()?;
 
-fn main() {
-    // variables
-    let vars = ConfigVars {
-        col_main: "#aab3c0".to_string(),
-        col_git_paren: "#aab3c0".to_string(),
-        col_git_branch: "#9ec1a3".to_string(),
-        set_space: true,
-        set_prompt_newline: true,
-        ico_prompt: "".to_string(),
-    };
+    // vars.debug_print();
 
     // init
     let mut r: Raket = Raket::new();
@@ -34,7 +21,7 @@ fn main() {
     // derive components
     r.get_cwd(&vars.col_main);
     r.get_git_branch(&vars.col_git_branch);
-    r.get_entry_sym(&vars.col_main, &vars.ico_prompt);
+    r.get_entry_sym(&vars.col_main, &vars.ico_entry);
 
     // build
     let prompt = r.build(&vars.col_git_paren, vars.set_prompt_newline);
@@ -46,6 +33,7 @@ fn main() {
     }
 
     print!("{newline}{prompt}");
+    Ok(())
 }
 
 #[derive(Clone, PartialEq)]

@@ -54,23 +54,23 @@ Launch Raket for the first time to generate a default config file:
 `~/.config/raket/config`  
   
 ``` conf
-icons [
-    prompt = ""
-]
+# === icons ===
 
-colors [
-    main = "#aab3c0"
-    git_branch = "#9ec1a3"
-    git_branch_paren = "#aab3c0"
-]
+ico_entry = 
 
-settings [
-    # add space in between each command
-    space = true
+# === colors ===
 
-    # if true, the prompt input will be below. if false, on the same line
-    prompt_newline = true
-]
+col_main = #aab4c0
+col_git_branch = #9ec1a3
+col_git_paren = #aab3c0
+
+# === settings ===
+
+# add space in between each command
+set_space = true
+
+# if true, the prompt input will be below. if false, on the same line
+set_prompt_newline = true
 ```
   
 ---
