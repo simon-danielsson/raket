@@ -60,6 +60,7 @@ fn main() -> io::Result<()> {
             });
         }
     }
+
     if vars.set_show_git_status {
         let content = r.get_git_status();
         if !content.is_empty() {
@@ -119,6 +120,7 @@ struct PromptComponent {
     fg_col_hex: String,
     content: String,
 }
+
 impl fmt::Display for PromptComponent {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
