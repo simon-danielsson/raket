@@ -71,13 +71,14 @@ fn main() -> io::Result<()> {
         }
     }
 
+    // *brakoll - d: add parens to cargo env, p: 50, t: feature, s: closed
     if vars.set_show_cargo_env {
         let content = r.get_cargo_env();
         if !content.is_empty() {
             r.components.push(PromptComponent {
                 ctype: ComponentType::CargoEnv,
                 fg_col_hex: vars.col_cargo_env.to_string(),
-                content: format!(" via  {}", content).to_string(),
+                content: format!(" [via  {}]", content).to_string(),
             });
         }
     }
@@ -216,6 +217,21 @@ impl Raket {
             .collect::<Vec<_>>()
             .join("");
         content
+
+        // let output2 = Command::new("git")
+        //     .args(["status", "-sb"])
+        //     .output()
+        //     .ok()
+        //     .unwrap();
+        // let output2 = String::from_utf8_lossy(&output2.stdout).trim().to_string();
+        // let mut git_remote_status = String::new();
+        // if output2.contains("ahead") {
+        //     git_remote_status = "󰃄".to_string();
+        // } else if output2.contains("behind") {
+        //     git_remote_status = "󱍺".to_string();
+        // }
+        //
+        // format!("{}{}", git_remote_status, content)
     }
 
     // *brakoll - d: add cargo env status, p: 0, t: feature, s: closed
