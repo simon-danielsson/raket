@@ -48,31 +48,38 @@ fn main() -> io::Result<()> {
 
     // *brakoll - d: place component additions in main fn instead, p: 100, t: refactor, s: closed
 
+    // *brakoll - d: move is_empty() methods to more appropriate places, p: 10, t: refactor, s: closed
     // *brakoll - d: parents in git branch still there if no git repo, p: 100, t: fix, s: closed
     if vars.set_show_git_branch {
         let content = r.get_git_branch();
-        r.components.push(PromptComponent {
-            ctype: ComponentType::GitBranch,
-            fg_col_hex: vars.col_git_branch.to_string(),
-            content: format!("{}", content).to_string(),
-        });
+        if !content.is_empty() {
+            r.components.push(PromptComponent {
+                ctype: ComponentType::GitBranch,
+                fg_col_hex: vars.col_git_branch.to_string(),
+                content: format!("{}", content).to_string(),
+            });
+        }
     }
     if vars.set_show_git_status {
         let content = r.get_git_status();
-        r.components.push(PromptComponent {
-            ctype: ComponentType::GitStatus,
-            fg_col_hex: vars.col_git_status.to_string(),
-            content,
-        });
+        if !content.is_empty() {
+            r.components.push(PromptComponent {
+                ctype: ComponentType::GitStatus,
+                fg_col_hex: vars.col_git_status.to_string(),
+                content,
+            });
+        }
     }
 
     if vars.set_show_cargo_env {
         let content = r.get_cargo_env();
-        r.components.push(PromptComponent {
-            ctype: ComponentType::CargoEnv,
-            fg_col_hex: vars.col_cargo_env.to_string(),
-            content: format!(" via  {}", content).to_string(),
-        });
+        if !content.is_empty() {
+            r.components.push(PromptComponent {
+                ctype: ComponentType::CargoEnv,
+                fg_col_hex: vars.col_cargo_env.to_string(),
+                content: format!(" via  {}", content).to_string(),
+            });
+        }
     }
 
     r.get_entry_sym(
@@ -141,11 +148,7 @@ impl Raket {
         for c in self.components.clone() {
             // git branch
             if c.ctype == ComponentType::GitBranch {
-                if c.content.is_empty() {
-                    {}
-                } else {
-                    prompt = format!("{} ({})", prompt, c)
-                }
+                prompt = format!("{} ({})", prompt, c)
             } else if c.ctype == ComponentType::Entry {
                 if set_prompt_newline {
                     prompt = format!("{}\n{} ", prompt, c)
