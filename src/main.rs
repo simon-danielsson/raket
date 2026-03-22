@@ -12,7 +12,6 @@ mod ansi;
 mod config;
 
 // *brakoll - d: add extra git details, p: 20, t: feature, s: closed
-// *brakoll - d: add cargo env status, p: 10, t: feature, s: open
 // *brakoll - d: add variable/logic for failed return code icon, p: 30, t: feature, s: closed
 
 // *brakoll - d: capture return code, p: 30, t: feature, s: closed
@@ -35,8 +34,6 @@ fn main() -> io::Result<()> {
     // config variables
     let vars: ConfigVars = config::get()?;
 
-    // vars.debug_print();
-
     // init
     let mut r: Raket = Raket::new();
 
@@ -48,6 +45,15 @@ fn main() -> io::Result<()> {
     }
     if vars.set_show_git_status {
         r.get_git_status(&vars.col_git_status);
+    }
+
+    if vars.set_show_cargo_env {
+        let cargo_v = r.get_cargo_env();
+        r.components.push(PromptComponent {
+            ctype: ComponentType::CargoEnv,
+            fg_col_hex: vars.col_cargo_env.to_string(),
+            content: format!(" via  {}", cargo_v).to_string(),
+        });
     }
 
     r.get_entry_sym(
@@ -72,6 +78,7 @@ fn main() -> io::Result<()> {
 
 #[derive(Clone, PartialEq)]
 enum ComponentType {
+    CargoEnv,
     GitStatus,
     GitBranch,
     Entry,
@@ -200,6 +207,19 @@ impl Raket {
         });
     }
 
+    // *brakoll - d: add cargo env status, p: 0, t: feature, s: closed
+    fn get_cargo_env(&mut self) -> String {
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg(
+                "cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version'",
+            )
+            .output()
+            .expect("failed to execute command");
+
+        String::from_utf8_lossy(&output.stdout).trim().to_string()
+    }
+
     fn get_git_branch(&mut self, color: &str) {
         let output = Command::new("git")
             .args(["rev-parse", "--abbrev-ref", "HEAD"])
@@ -208,11 +228,6 @@ impl Raket {
             .unwrap();
 
         if !output.status.success() {
-            self.components.push(PromptComponent {
-                ctype: ComponentType::GitBranch,
-                fg_col_hex: color.to_string(),
-                content: String::new(),
-            });
             return;
         }
 
@@ -225,4 +240,3 @@ impl Raket {
         });
     }
 }
-

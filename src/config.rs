@@ -65,6 +65,9 @@ fn parse_config(file: PathBuf) -> io::Result<ConfigVars> {
             l if l.starts_with("col_git_status") => {
                 conf.col_git_status = get_value(lines);
             }
+            l if l.starts_with("col_cargo_env") => {
+                conf.col_cargo_env = get_value(lines);
+            }
 
             // settings
             l if l.starts_with("set_space") => {
@@ -78,6 +81,9 @@ fn parse_config(file: PathBuf) -> io::Result<ConfigVars> {
             }
             l if l.starts_with("set_show_git_status") => {
                 conf.set_show_git_status = parse_bool(&get_value(l));
+            }
+            l if l.starts_with("set_show_cargo_env") => {
+                conf.set_show_cargo_env = parse_bool(&get_value(l));
             }
             _ => {}
         }
@@ -106,10 +112,12 @@ pub struct ConfigVars {
     pub col_main: String,
     pub col_git_status: String,
     pub col_git_branch: String,
+    pub col_cargo_env: String,
     pub set_space: bool,
     pub set_prompt_newline: bool,
     pub set_show_git_branch: bool,
     pub set_show_git_status: bool,
+    pub set_show_cargo_env: bool,
 }
 
 impl ConfigVars {
@@ -123,20 +131,12 @@ impl ConfigVars {
             col_main: "#aab3c0".to_string(),
             col_git_status: "#aab3c0".to_string(),
             col_git_branch: "#9ec1a3".to_string(),
+            col_cargo_env: "#aa4465".to_string(),
             set_space: true,
             set_prompt_newline: true,
             set_show_git_branch: true,
             set_show_git_status: true,
+            set_show_cargo_env: true,
         }
-    }
-    #[allow(dead_code)]
-    pub fn debug_print(&mut self) {
-        println!("icon entry: {}", self.ico_entry_success);
-        println!("icon entry: {}", self.ico_entry_failed);
-        println!("color main: {}", self.col_main);
-        println!("col git branch: {}", self.col_git_branch);
-        println!("col git paren: {}", self.col_git_status);
-        println!("set space: {}", self.set_space);
-        println!("set prompt nl: {}", self.set_prompt_newline);
     }
 }
