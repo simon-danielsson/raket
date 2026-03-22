@@ -37,22 +37,41 @@ fn main() -> io::Result<()> {
     // init
     let mut r: Raket = Raket::new();
 
-    r.get_cwd(&vars.col_main);
+    {
+        let content = r.get_cwd();
+        r.components.push(PromptComponent {
+            ctype: ComponentType::CWD,
+            fg_col_hex: vars.col_main.to_string(),
+            content: format!("{}", content).to_string(),
+        });
+    }
+
+    // *brakoll - d: place component additions in main fn instead, p: 100, t: refactor, s: closed
 
     // *brakoll - d: parents in git branch still there if no git repo, p: 100, t: fix, s: closed
     if vars.set_show_git_branch {
-        r.get_git_branch(&vars.col_git_branch);
+        let content = r.get_git_branch();
+        r.components.push(PromptComponent {
+            ctype: ComponentType::GitBranch,
+            fg_col_hex: vars.col_git_branch.to_string(),
+            content: format!("{}", content).to_string(),
+        });
     }
     if vars.set_show_git_status {
-        r.get_git_status(&vars.col_git_status);
+        let content = r.get_git_status();
+        r.components.push(PromptComponent {
+            ctype: ComponentType::GitStatus,
+            fg_col_hex: vars.col_git_status.to_string(),
+            content,
+        });
     }
 
     if vars.set_show_cargo_env {
-        let cargo_v = r.get_cargo_env();
+        let content = r.get_cargo_env();
         r.components.push(PromptComponent {
             ctype: ComponentType::CargoEnv,
             fg_col_hex: vars.col_cargo_env.to_string(),
-            content: format!(" via  {}", cargo_v).to_string(),
+            content: format!(" via  {}", content).to_string(),
         });
     }
 
@@ -162,7 +181,7 @@ impl Raket {
     }
 
     // *brakoll - d: refactor cwd logic, p: 100, t: refactor, s: closed
-    fn get_cwd(&mut self, color: &str) {
+    fn get_cwd(&mut self) -> String {
         let cd = env::current_dir()
             .ok()
             .map(|s| s.to_string_lossy().into_owned())
@@ -172,16 +191,10 @@ impl Raket {
             .map(|s| s.to_string_lossy().into_owned())
             .unwrap_or("?".into());
 
-        let cwd_content = cd.replace(&home, &self.home_sym);
-
-        self.components.push(PromptComponent {
-            ctype: ComponentType::CWD,
-            fg_col_hex: color.to_string(),
-            content: cwd_content,
-        });
+        cd.replace(&home, &self.home_sym)
     }
 
-    fn get_git_status(&mut self, color: &str) {
+    fn get_git_status(&mut self) -> String {
         let output = Command::new("git")
             .args(["status", "--porcelain"])
             .output()
@@ -199,12 +212,7 @@ impl Raket {
             })
             .collect::<Vec<_>>()
             .join("");
-
-        self.components.push(PromptComponent {
-            ctype: ComponentType::GitStatus,
-            fg_col_hex: color.to_string(),
-            content,
-        });
+        content
     }
 
     // *brakoll - d: add cargo env status, p: 0, t: feature, s: closed
@@ -220,23 +228,15 @@ impl Raket {
         String::from_utf8_lossy(&output.stdout).trim().to_string()
     }
 
-    fn get_git_branch(&mut self, color: &str) {
+    fn get_git_branch(&mut self) -> String {
         let output = Command::new("git")
             .args(["rev-parse", "--abbrev-ref", "HEAD"])
             .output()
             .ok()
             .unwrap();
-
         if !output.status.success() {
-            return;
+            return String::new();
         }
-
-        let branch = String::from_utf8_lossy(&output.stdout).trim().to_string();
-
-        self.components.push(PromptComponent {
-            ctype: ComponentType::GitBranch,
-            fg_col_hex: color.to_string(),
-            content: format!("{}", branch).to_string(),
-        });
+        String::from_utf8_lossy(&output.stdout).trim().to_string()
     }
 }
