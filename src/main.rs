@@ -79,7 +79,7 @@ fn main() -> io::Result<()> {
             r.components.push(PromptComponent {
                 ctype: ComponentType::CargoEnv,
                 fg_col_hex: vars.col_cargo_env.to_string(),
-                content: format!(" [via  {}]", content).to_string(),
+                content: format!("via  {}", content).to_string(),
             });
         }
     }
@@ -152,6 +152,9 @@ impl Raket {
             // git branch
             if c.ctype == ComponentType::GitBranch {
                 prompt = format!("{} ({})", prompt, c)
+                // *brakoll - d: remove brackets around cargo env, p: , t: fix, s: closed
+            } else if c.ctype == ComponentType::CargoEnv {
+                prompt = format!("{} {}", prompt, c)
             } else if c.ctype == ComponentType::Entry {
                 if set_prompt_newline {
                     prompt = format!("{}\n{} ", prompt, c)
