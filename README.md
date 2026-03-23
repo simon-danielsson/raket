@@ -75,6 +75,7 @@ col_git_branch = #99C379
 col_git_status = #DF6C74
 
 col_cargo_env = #D9A281
+col_uv_env = #F9E2B1
 
 # === settings ===
 
@@ -88,6 +89,7 @@ set_show_git_branch = true
 set_show_git_status = true
 
 set_show_cargo_env = true
+set_show_uv_env = true
 ```
   
 ---

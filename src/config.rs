@@ -68,6 +68,9 @@ fn parse_config(file: PathBuf) -> io::Result<ConfigVars> {
             l if l.starts_with("col_cargo_env") => {
                 conf.col_cargo_env = get_value(lines);
             }
+            l if l.starts_with("col_uv_env") => {
+                conf.col_uv_env = get_value(lines);
+            }
 
             // settings
             l if l.starts_with("set_space") => {
@@ -84,6 +87,9 @@ fn parse_config(file: PathBuf) -> io::Result<ConfigVars> {
             }
             l if l.starts_with("set_show_cargo_env") => {
                 conf.set_show_cargo_env = parse_bool(&get_value(l));
+            }
+            l if l.starts_with("set_show_uv_env") => {
+                conf.set_show_uv_env = parse_bool(&get_value(l));
             }
             _ => {}
         }
@@ -113,11 +119,13 @@ pub struct ConfigVars {
     pub col_git_status: String,
     pub col_git_branch: String,
     pub col_cargo_env: String,
+    pub col_uv_env: String,
     pub set_space: bool,
     pub set_prompt_newline: bool,
     pub set_show_git_branch: bool,
     pub set_show_git_status: bool,
     pub set_show_cargo_env: bool,
+    pub set_show_uv_env: bool,
 }
 
 impl ConfigVars {
@@ -132,11 +140,13 @@ impl ConfigVars {
             col_git_status: "#aab3c0".to_string(),
             col_git_branch: "#9ec1a3".to_string(),
             col_cargo_env: "#aa4465".to_string(),
+            col_uv_env: "#F9E2B1".to_string(),
             set_space: true,
             set_prompt_newline: true,
             set_show_git_branch: true,
             set_show_git_status: true,
             set_show_cargo_env: true,
+            set_show_uv_env: true,
         }
     }
 }

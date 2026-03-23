@@ -84,6 +84,18 @@ fn main() -> io::Result<()> {
         }
     }
 
+    // *brakoll - d: implement python uv env setting, p: 100, t: feature, s: closed
+    if vars.set_show_uv_env {
+        let content = r.get_uv_env();
+        if !content.is_empty() {
+            r.components.push(PromptComponent {
+                ctype: ComponentType::UvEnv,
+                fg_col_hex: vars.col_uv_env.to_string(),
+                content: format!("via  {}", content).to_string(),
+            });
+        }
+    }
+
     r.get_entry_sym(
         &vars.col_entry_success,
         &vars.ico_entry_success,
@@ -106,6 +118,7 @@ fn main() -> io::Result<()> {
 
 #[derive(Clone, PartialEq)]
 enum ComponentType {
+    UvEnv,
     CargoEnv,
     GitStatus,
     GitBranch,
@@ -154,6 +167,8 @@ impl Raket {
                 prompt = format!("{} ({})", prompt, c)
                 // *brakoll - d: remove brackets around cargo env, p: , t: fix, s: closed
             } else if c.ctype == ComponentType::CargoEnv {
+                prompt = format!("{} {}", prompt, c)
+            } else if c.ctype == ComponentType::UvEnv {
                 prompt = format!("{} {}", prompt, c)
             } else if c.ctype == ComponentType::Entry {
                 if set_prompt_newline {
@@ -237,6 +252,18 @@ impl Raket {
         // }
         //
         // format!("{}{}", git_remote_status, content)
+    }
+
+    fn get_uv_env(&mut self) -> String {
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg("uv version")
+            .output()
+            .expect("failed to execute command");
+
+        let output = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        let (_, version) = output.split_once(' ').unwrap();
+        version.to_string()
     }
 
     // *brakoll - d: add cargo env status, p: 0, t: feature, s: closed
