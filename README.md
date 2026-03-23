@@ -26,6 +26,8 @@
 ## Features
   
 - Configuration file that's easy to set up!
+- Simple but effective git integration.
+- Detects both [cargo](https://github.com/rust-lang/cargo) and [uv](https://github.com/astral-sh/uv) environment package version.
   
 > [!IMPORTANT]  
 > Raket has currently only been tested on MacOS.
