@@ -262,7 +262,11 @@ impl Raket {
             .expect("failed to execute command");
 
         let output = String::from_utf8_lossy(&output.stdout).trim().to_string();
-        let (_, version) = output.split_once(' ').unwrap();
+        // *brakoll - d: unwrapping leads to panic at uv env formatting, p: 100, t: fix, s: closed
+        let mut version = "";
+        if output != "" {
+            (_, version) = output.split_once(' ').unwrap();
+        }
         version.to_string()
     }
 
